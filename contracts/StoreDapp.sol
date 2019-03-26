@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./StoreToken.sol";
 
-contract Store {
+contract StoreDapp {
     mapping(address => uint256) public _userCars;
     mapping(address => uint256) public _userGas;
     uint256 _carPrice = 100;
