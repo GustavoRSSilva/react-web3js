@@ -7,7 +7,7 @@ import HomePage from './containers/HomePage';
 import "./App.css";
 
 const storeTokenAddress = "0x880a03fcbbd8cdd6abaaecc089e08d227c55f164";
-const storeDappAddress = "0x275e25348cC2219BC142c99fA4E43E68d91547D7"
+const storeDappAddress = "0x8E2F53C1f21Ec9c2192F15dA3c0f146eEDF75b4D"
 
 class App extends Component {
   state = {
@@ -20,6 +20,13 @@ class App extends Component {
     StoreTokenContract: null,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.handleBuyCar = this.handleBuyCar.bind(this);
+    this.handleBuyGas = this.handleBuyGas.bind(this);
+  }
+
   componentDidMount = async () => {
     try {
       // Get network provider and web3 instance.
@@ -27,6 +34,7 @@ class App extends Component {
 
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
+      web3.eth.defaultAccount = accounts[0];
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
@@ -56,19 +64,56 @@ class App extends Component {
   runExample = async () => {
     const { accounts, StoreDappContract, StoreTokenContract } = this.state;
 
-    console.log(StoreDappContract.methods);
-
     // Get the value from the contract to prove it worked.
     const userTokens = await StoreTokenContract.methods.balanceOf(accounts[0]).call();
 
     // Get the value from the contract to prove it worked.
-    const userCars = await StoreDappContract.methods.getUserCars().call();
+    const userCars = await StoreDappContract.methods.getUserCars(accounts[0]).call();
 
     // Get the value from the contract to prove it worked.
-    const userGas = await StoreDappContract.methods.getUserGas().call();
+    const userGas = await StoreDappContract.methods.getUserGas(accounts[0]).call();
 
     // Update state with the result.
     this.setState({ userCars: userCars, userGas: userGas, userTokens: userTokens });
+  };
+
+  handleBuyCar = async (evt) => {
+    evt.preventDefault();
+
+    const { web3, StoreDappContract, StoreTokenContract } = this.state;
+
+    const carPrice = 100;
+
+    // Allow amount
+    await StoreTokenContract.methods.approve(storeDappAddress, carPrice).send({ from: web3.eth.defaultAccount });
+
+    // Get the value from the contract to prove it worked.
+    const result = await StoreDappContract.methods.buyCar().send({ from: web3.eth.defaultAccount });
+
+    if (result) {
+      this.runExample();
+      alert("You just brought a car!!");
+    }
+  };
+
+  handleBuyGas = async (evt, amount) => {
+    evt.preventDefault();
+
+    const { web3, StoreDappContract, StoreTokenContract } = this.state;
+
+    const gasPrice = 1;
+    const total = amount * gasPrice;
+
+    // Allow amount
+    await StoreTokenContract.methods.approve(storeDappAddress, total).send({ from: web3.eth.defaultAccount });
+
+    // Get the value from the contract to prove it worked.
+    const result = await StoreDappContract.methods.buyGas(amount).send({ from: web3.eth.defaultAccount });
+
+    if (result) {
+      this.runExample();
+      alert(`You just brought ${amount} of gas!`);
+    }
   };
 
   render() {
@@ -76,9 +121,7 @@ class App extends Component {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
 
-    console.log(this.state);
-
-    const { userTokens } = this.state;
+    const { userTokens, userCars, userGas } = this.state;
 
     return (
       <div className="App">
@@ -86,7 +129,13 @@ class App extends Component {
         <p>Your Truffle Box is installed and ready.</p>
 
         <p>You have {userTokens} available.</p>
-        <HomePage />
+        <p>You have {userCars} cars.</p>
+        <p>You have {userGas} gas available.</p>
+
+        <HomePage
+          handleBuyCar={this.handleBuyCar}
+          handleBuyGas={this.handleBuyGas}
+          />
 
       </div>
     );
