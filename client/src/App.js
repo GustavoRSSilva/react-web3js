@@ -126,8 +126,6 @@ class App extends Component {
     return (
       <div className="App">
         <h1>Welcome to the shop</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-
         <p>You have {userTokens} Store tokens available.</p>
         <p>You have {userCars} cars.</p>
         <p>You have {userGas} gas available.</p>
