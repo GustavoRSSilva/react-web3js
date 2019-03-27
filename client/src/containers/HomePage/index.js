@@ -1,5 +1,8 @@
 import React from 'react';
 import Proptypes from 'prop-types';
+import SportCar from '../../assets/sportsCar.svg';
+import Fuel from '../../assets/fuel.svg';
+import './homepage.css';
 
 class HomePage extends React.Component {
 
@@ -10,7 +13,12 @@ class HomePage extends React.Component {
         <form onSubmit={(evt) => handleBuyCar(evt)}>
           <label>
             Car (100 StoreTokens):
-            <input type="submit" value="Buy a new car" onClick={() => null}/>
+            <button type="submit"  onClick={() => null} >
+              <img
+                src={SportCar}
+                alt="car"
+              />
+            </button>
           </label>
         </form>
 
@@ -24,11 +32,16 @@ class HomePage extends React.Component {
                 required
               />
           </label>
-          <input
+          <button
             type="submit"
             value="Submit"
             onClick={() => null}
-          />
+          >
+            <img
+              src={Fuel}
+              alt="fuel"
+            />
+          </button>
         </form>
       </div>
     );
